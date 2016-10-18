@@ -15,7 +15,7 @@ public class TicketManager {
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
 
         Scanner scan = new Scanner(System.in);
-        try (BufferedReader bufReader = new BufferedReader(new FileReader("openTickets.txt"));){
+        try ( BufferedReader bufReader = new BufferedReader(new FileReader("openTickets.txt"));){
             LinkedList<String> fileList= new LinkedList<>();
 
             String line= bufReader.readLine();
@@ -83,6 +83,7 @@ public class TicketManager {
         writeOpen(ticketQueue);
         scan.close();
 
+
     }
     private static void writeResolved(LinkedList<Ticket> resolvedTickets){
         Date date = new Date();
@@ -94,34 +95,33 @@ public class TicketManager {
         String year= sdfYear.format(date);
 
         String fileName = "Resolved_tickets_as_of_"+month+"_"+day+"_"+year+".txt";
-        try{
-        BufferedWriter bufWrite = new BufferedWriter(new FileWriter(fileName));
-            for (Ticket t :resolvedTickets){
-                String writeFileLine = t.toString("resolved");
-                bufWrite.write(writeFileLine);
+            try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter(fileName))) {
+                for (Ticket t : resolvedTickets) {
+                    String writeFileLine = t.toString("resolved");
+                    bufWrite.write(writeFileLine);
+                }
             }
-        }
-
         catch(IOException ex){
             System.out.println("An IO Exception occured");
         }
 
     }
     private static void writeOpen(LinkedList<Ticket> ticketQueue){
-        try{
-            BufferedWriter bufWrite = new BufferedWriter(new FileWriter("openTickets.txt"));
-            for (Ticket t :ticketQueue){
-                bufWrite.write(t.getDescription());
-                bufWrite.write(t.getTicketID());
-                bufWrite.write(t.getReporter());
-                DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy");
-                String date = df.format(t.getResolutionDate());
-                bufWrite.write(date);
+        if (!ticketQueue.isEmpty()) {
+            try {
+                try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter("openTickets.txt"))) {
+                    for (Ticket t : ticketQueue) {
+                        bufWrite.write(t.getDescription());
+                        bufWrite.write(t.getTicketID());
+                        bufWrite.write(t.getReporter());
+                        DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy");
+                        String date = df.format(t.getDateReported());
+                        bufWrite.write(date);
+                    }
+                }
+            } catch (IOException ex) {
+                System.out.println("An IO Exception occured");
             }
-        }
-
-        catch(IOException ex){
-            System.out.println("An IO Exception occured");
         }
     }
     private static LinkedList<Ticket> searchTicketbyName(LinkedList<Ticket> ticketQueue) {
