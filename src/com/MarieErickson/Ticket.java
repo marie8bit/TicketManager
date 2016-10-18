@@ -24,6 +24,9 @@ public class Ticket {
     //The ID for each ticket - instance variable. Each Ticket will have it's own ticketID variable
     private int ticketID;
 
+    private String resolution;
+    private Date resolutionDate;
+
     public Ticket(String desc, int p, String rep, Date date) {
         this.description = desc;
         this.priority = p;
@@ -52,6 +55,23 @@ public class Ticket {
     }
     public String getReporter() {
         return reporter;
+    }
+
+
+    public String getResolution() {
+        return resolution;
+    }
+
+    public void setResolution(String resolution) {
+        this.resolution = resolution;
+    }
+
+    public Date getResolutionDate() {
+        return resolutionDate;
+    }
+
+    public void setResolutionDate(Date resolutionDate) {
+        this.resolutionDate = resolutionDate;
     }
 }
 

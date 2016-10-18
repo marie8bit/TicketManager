@@ -31,7 +31,7 @@ public class TicketManager {
             }  else if (task == 4) {
                 //delete a ticket
                 LinkedList<Ticket> n3 =searchTicketbyName(ticketQueue);
-                deleteTicketbyIssue(ticketQueue, n3);
+                deleteTicketbyID(ticketQueue, n3);
             }  else if (task == 5){
                 printAllTickets(ticketQueue);
             }  else if (task == 6) {
@@ -49,33 +49,22 @@ public class TicketManager {
 
     }
 
-//    private static void searchTicketbyIssue(LinkedList<Ticket> ticketQueue) {
-//        LinkedList<Ticket> searchResults = new LinkedList<>();
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.println("Please enter the keyword(s) you would like to search for");
-//        String search = scanner.nextLine();
-//        for (Ticket t :ticketQueue){
-//            if (t.getDescription().contains(search)){
-//                searchResults.add(t);
-//            }
-//            deleteTicketbyIssue( ticketQueue,searchResults);
-//            searchResults.clear();
-//        }
-//    }
 
     private static LinkedList<Ticket> searchTicketbyName(LinkedList<Ticket> ticketQueue) {
         LinkedList<Ticket> searchResults = new LinkedList<>();
+        if (ticketQueue.isEmpty()){
+            System.out.println("No open tickets to search");
+            return searchResults;
+        }
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter the keyword(s) you would like to search for");
         String search = scanner.nextLine();
         for (Ticket t :ticketQueue) {
-            if (t.getReporter().contains(search)) {
+            if (t.getDescription().contains(search)) {
                 searchResults.add(t);
             }
         }
-        System.out.println("------List of tickets reported by"+search+"------");
         printAllTickets(searchResults);
-        System.out.println("------End of List------");
         return searchResults;
     }
 
@@ -115,12 +104,11 @@ public class TicketManager {
 
     }
 
-    protected static void deleteTicketbyIssue(LinkedList<Ticket> ticketQueue,
+    protected static void deleteTicketbyID(LinkedList<Ticket> ticketQueue,
                                            LinkedList<Ticket> searchResults) {
-        printAllTickets(searchResults);   //display list for user
 
         if (searchResults.size() == 0) {    //no tickets!
-            System.out.println("No tickets to delete!\n");
+            System.out.println("No tickets found!\n");
             return;
         }
 
@@ -145,7 +133,7 @@ public class TicketManager {
             Scanner sc = new Scanner(System.in);
             String more = sc.nextLine();
             if (more.equalsIgnoreCase("y")) {
-                deleteTicketbyIssue(ticketQueue, searchResults);
+                deleteTicketbyID(ticketQueue, searchResults);
             }
         }
         printAllTickets(ticketQueue);  //print updated list
@@ -211,7 +199,7 @@ public class TicketManager {
         tickets.addLast(newTicket);
     }
     protected static void printAllTickets(LinkedList<Ticket> tickets) {
-        System.out.println(" ------- All open tickets ----------");
+        System.out.println(" ------- List of Open Tickets ----------");
 
         for (Ticket t : tickets ) {
             System.out.println(t); //Write a toString method in Ticket class
