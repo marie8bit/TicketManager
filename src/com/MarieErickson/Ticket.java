@@ -50,9 +50,9 @@ public class Ticket {
     }
 
     public  String toString(String resolved){
-        return ("ID= " + this.getTicketID() + " Issued: " + this.description
-                + " Priority: " + this.priority + " Reported by: "
-                + this.reporter + " Reported on: " + this.dateReported+
+        return ("ID= " + this.getTicketID() + " \nIssued: " + this.description
+                + " \nPriority: " + this.priority + " \nReported by: "
+                + this.reporter + " \nReported on: " + this.dateReported+
                 "\nResolution: "+this.resolution+"\nResolution Date: "+this.resolutionDate);
     }
 

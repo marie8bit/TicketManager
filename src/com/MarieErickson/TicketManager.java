@@ -15,34 +15,36 @@ public class TicketManager {
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
 
         Scanner scan = new Scanner(System.in);
-        try ( BufferedReader bufReader = new BufferedReader(new FileReader("openTickets.txt"));){
-            LinkedList<String> fileList= new LinkedList<>();
-
-            String line= bufReader.readLine();
-            while (bufReader.readLine()!=null){
+        try ( BufferedReader bufReader = new BufferedReader(new FileReader("openTickets.txt"));) {
+            LinkedList<String> fileList = new LinkedList<>();
+            String line = bufReader.readLine();
+            while (line != null) {
                 fileList.add(line);
+                line = bufReader.readLine();
             }
-
-            for (int x=0; x<fileList.size();x+=4) {
+            if (!fileList.isEmpty()){
+            for (int x = 0; x < fileList.size(); x += 4) {
                 try {
                     String des = fileList.get(x);
                     int id = Integer.parseInt(fileList.get(x + 1));
                     String rep = fileList.get(x + 2);
                     DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy");
                     Date date = df.parse(fileList.get(x + 3));
-                    Ticket readTic = new Ticket(des, id,rep,date);
+                    Ticket readTic = new Ticket(des, id, rep, date);
                     ticketQueue.add(readTic);
+
                 } catch (ParseException pe) {
                     {
                         System.out.println("date failed to parse");
                     }
                 }
-            }
-
+            }printAllTickets(ticketQueue);
+        }
         }
         catch (IOException ex){
             System.out.println("File not found");
         }
+
         while(true){
 
 
@@ -112,11 +114,16 @@ public class TicketManager {
                 try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter("openTickets.txt"))) {
                     for (Ticket t : ticketQueue) {
                         bufWrite.write(t.getDescription());
-                        bufWrite.write(t.getTicketID());
+                        bufWrite.newLine();
+                        int id=t.getTicketID();
+                        bufWrite.write(Integer.toString(id));
+                        bufWrite.newLine();
                         bufWrite.write(t.getReporter());
+                        bufWrite.newLine();
                         DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy");
                         String date = df.format(t.getDateReported());
                         bufWrite.write(date);
+                        bufWrite.newLine();
                     }
                 }
             } catch (IOException ex) {
