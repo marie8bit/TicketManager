@@ -15,6 +15,9 @@ public class Ticket {
 
 
     private String description;
+
+
+
     private Date dateReported;
 
     //STATIC Counter - accessible to all Ticket objects.
@@ -46,6 +49,13 @@ public class Ticket {
                 + this.reporter + " Reported on: " + this.dateReported);
     }
 
+    public  String toString(String resolved){
+        return ("ID= " + this.getTicketID() + " Issued: " + this.description
+                + " Priority: " + this.priority + " Reported by: "
+                + this.reporter + " Reported on: " + this.dateReported+
+                "\nResolution: "+this.resolution+"\nResolution Date: "+this.resolutionDate);
+    }
+
     public int getTicketID() {
         return ticketID;
     }
@@ -56,7 +66,9 @@ public class Ticket {
     public String getReporter() {
         return reporter;
     }
-
+    public Date getDateReported() {
+        return dateReported;
+    }
 
     public String getResolution() {
         return resolution;
