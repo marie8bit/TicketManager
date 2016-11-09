@@ -32,28 +32,33 @@ public class NewTicketGUI extends JFrame
     private JLabel lblEdit;
     private JButton resolveTicketButton;
     private DefaultListModel<Ticket>listModel;
-
+    //code to initialize GUI form/JFrame
     protected NewTicketGUI(LinkedList<Ticket> resolved, LinkedList<Ticket> queue){
         setContentPane(rootPanel);
         listModel = new DefaultListModel<Ticket>();
+        //initializes jList box with list model
         stJList.setModel(listModel);
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
+        //add listeners methods for components
         addListeners(resolved,queue);
         addListeners(queue);
         pack();
         setVisible(true);
+        //click event that corresponds to enter keyboard button click
         getRootPane().setDefaultButton(btnAddNewT);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //shows date on GUI
         Date GUIDate = new Date();
         DateFormat df = new SimpleDateFormat("EEE MMM dd");
         String date = df.format(GUIDate);
         lblDate.setText(date);
-
+        //displays open tickets in Jlist
         if (!queue.isEmpty())
         {
             for (Ticket t : queue)
             {
                 listModel.addElement(t);
+                //provide user friendly experience
                 lblEdit.setText("Select a ticket to resolve, then click the resolve button");
             }
         }
@@ -62,23 +67,29 @@ public class NewTicketGUI extends JFrame
         }
     }
     private void addListeners(LinkedList<Ticket> queue){
+        //button click event handler
         btnAddNewT.addActionListener(new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-
+                //create new ticket
                 Date tDate = new Date();
                 Ticket tNew = new Ticket(txtProblem.getText(), comboPriority.getSelectedIndex()+1,
                         txtReporter.getText(), tDate);
+                //add ticket to the ticket queue
                 addTicketInPriorityOrder(queue, tNew);
+                //writes new ticket to file
                 writeOpen(queue);
+                //clears jList
                 listModel.clear();
+                //fills Jlist with tickets in priority order
                 for (Ticket t : queue)
                 {
                     listModel.addElement(t);
 
                 }
+                //uses labels to provide instructions to user
                 lblEdit.setText("Select a ticket to resolve, then click the resolve button");
             }
         });
@@ -92,12 +103,15 @@ public class NewTicketGUI extends JFrame
             }
         });
 
-
+        //resolve button click event handler
         resolveTicketButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //calls delete Ticket method
                 deleteTicketbyID(resolved, queue, stJList.getSelectedIndex());
+                //removes element from Jlist
                 listModel.removeElementAt(stJList.getSelectedIndex());
+                //removes ticket from open ticket file
                 writeOpen(queue);
             }
         });
@@ -137,9 +151,7 @@ public class NewTicketGUI extends JFrame
                 resolvedTickets.add(ticket);
     }
     private static void setResolutionAndDate(Ticket ticket, LinkedList<Ticket> resolved){
-        //Scanner scanner= new Scanner(System.in);
-        //System.out.println("Enter the reason why the ticket is being deleted");
-        //String res = scanner.nextLine();
+
         //time stamp resolution
         ResolutionGUI resGUI = new ResolutionGUI(ticket, resolved);
         ticket.setResolutionDate(new Date());
@@ -147,7 +159,8 @@ public class NewTicketGUI extends JFrame
     private static void writeOpen(LinkedList<Ticket> ticketQueue){
         if (!ticketQueue.isEmpty()) {
             try {
-                //set up writing to facilitate reading of the file to generate objects
+                //set up writing to facilitate future reading of the file to generate objects
+                //overwrites file with current list
                 try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter("openTickets.txt"))) {
                     for (Ticket t : ticketQueue) {
                         int id = t.getTicketID();

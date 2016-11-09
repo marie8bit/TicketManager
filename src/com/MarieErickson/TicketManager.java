@@ -121,7 +121,7 @@ public class TicketManager {
                  }
             }
 
-            printAllTickets(ticketQueue);
+            //printAllTickets(ticketQueue);
         }
         }
         catch (IOException ex){
@@ -164,197 +164,198 @@ public class TicketManager {
 //
 //        }
         //methods to write data to files
-        writeResolved(resolvedTickets);
+        //writeResolved(resolvedTickets);
         //close new ticket form method return list
         // ticketQueue = stJList.
-        writeOpen(ticketQueue);
+        //writeOpen(ticketQueue);
         //scan.close();
 
 
     }
+
     //code to write resolved tickets to a text file
-    private static void writeResolved(LinkedList<Ticket> resolvedTickets){
-        //get variables to generate a file name with current date parts
-        Date date = new Date();
-        SimpleDateFormat sdfDay = new SimpleDateFormat("dd");
-        String day = sdfDay.format(date);
-        SimpleDateFormat sdfMonth = new SimpleDateFormat("MMMM");
-        String month = sdfMonth.format(date);
-        SimpleDateFormat sdfYear = new SimpleDateFormat("YYYY");
-        String year= sdfYear.format(date);
-        //generated file name
-        String fileName = "Resolved_tickets_as_of_"+month+"_"+day+"_"+year+".txt";
-            try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter(fileName))) {
-                for (Ticket t : resolvedTickets) {
-                    //call overridden toString from ticket class
-                    String writeFileLine = t.toString("resolved");
-                    bufWrite.write(writeFileLine);
-                }
-            }
-        catch(IOException ex){
-            System.out.println("An IO Exception occured");
-        }
-
-    }
-    private static void writeOpen(LinkedList<Ticket> ticketQueue){
-        if (!ticketQueue.isEmpty()) {
-            try {
-                //set up writing to facilitate reading of the file to generate objects
-                try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter("openTickets.txt"))) {
-                    for (Ticket t : ticketQueue) {
-                        int id = t.getTicketID();
-                        bufWrite.write(Integer.toString(id));
-                        bufWrite.newLine();
-                        bufWrite.write(t.getDescription());
-                        bufWrite.newLine();
-                        int p=t.getPriority();
-                        bufWrite.write(Integer.toString(p));
-                        bufWrite.newLine();
-                        bufWrite.write(t.getReporter());
-                        bufWrite.newLine();
-                        DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy");
-                        String date = df.format(t.getDateReported());
-                        bufWrite.write(date);
-                        bufWrite.newLine();
-                    }
-                }
-            } catch (IOException ex) {
-                System.out.println("An IO Exception occured");
-            }
-        }
-    }
-    private static LinkedList<Ticket> searchTicketbyName(LinkedList<Ticket> ticketQueue) {
-        LinkedList<Ticket> searchResults = new LinkedList<>();
-        if (ticketQueue.isEmpty()){
-            System.out.println("No open tickets to search");
-            return searchResults;
-        }
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter the keyword(s) you would like to search for");
-        String search = scanner.nextLine();
-        //search list of tickets for keyword
-        for (Ticket t :ticketQueue) {
-            if (t.getDescription().contains(search)) {
-                searchResults.add(t);
-            }
-        }
-        printAllTickets(searchResults);
-        return searchResults;
-    }
-
-    protected static void deleteTicketbyID(LinkedList<Ticket> resolvedTickets, LinkedList<Ticket> ticketQueue) {
-        printAllTickets(ticketQueue);   //display list for user
-
-        if (ticketQueue.size() == 0) {    //no tickets!
-            System.out.println("No tickets to delete!\n");
-            return;
-        }
-
-
-        System.out.println("Enter ID of ticket to delete");
-        int deleteID = getPositiveIntInput();
-
-        //Loop over all tickets. Delete the one with this ticket ID
-        boolean found = false;
-        for (Ticket ticket : ticketQueue) {
-            if (ticket.getTicketID() == deleteID) {
-                found = true;
-                setResolutionAndDate(ticket);
-                ticketQueue.remove(ticket);
-                //add resolved tickets for file storage
-                resolvedTickets.add(ticket);
-                System.out.println(String.format("Ticket %d deleted", deleteID));
-                break; //don't need loop any more.
-            }
-        }
-
-        if (found == false) {
-            System.out.println("Ticket ID not found, no ticket deleted");
-            System.out.println("Would you like to try again? Y for yes");
-            Scanner sc = new Scanner(System.in);
-            String more = sc.nextLine();
-            if (more.equalsIgnoreCase("y")) {
-                //allow user to re-enter the ticket id
-                deleteTicketbyID(resolvedTickets, ticketQueue);
-            }
-        }
-        printAllTickets(ticketQueue);  //print updated list
-
-    }
-    //override method to include search results from search method
-    protected static void deleteTicketbyID(LinkedList<Ticket> resolvedTickets,
-                                           LinkedList<Ticket> ticketQueue,
-                                           LinkedList<Ticket> searchResults) {
-        if (ticketQueue.size()==0) {
-            System.out.println("No tickets found!\n");
-            return;
-        }
-        if (searchResults.size() == 0) {    //no tickets!
-            System.out.println("No tickets found!\n");
-            return;
-        }
-        printAllTickets(searchResults);
-        System.out.println("Enter ID of ticket to delete");
-        int deleteID = getPositiveIntInput();
-
-        //Loop over all tickets. Delete the one with this ticket ID
-        boolean found = false;
-        for (Ticket ticket : searchResults) {
-            if (ticket.getTicketID() == deleteID) {
-                found = true;
-                //get/set resolution for ticket to be deleted
-                setResolutionAndDate(ticket);
-                ticketQueue.remove(ticket);
-                //add ticket to resolved list
-                resolvedTickets.add(ticket);
-                System.out.println(String.format("Ticket %d deleted", deleteID));
-                break; //don't need loop any more.
-            }
-        }
-
-        if (found == false) {
-            System.out.println("Ticket ID not found, no ticket deleted");
-            System.out.println("Would you like to try again? Y for yes");
-            Scanner sc = new Scanner(System.in);
-            String more = sc.nextLine();
-            if (more.equalsIgnoreCase("y")) {
-                deleteTicketbyID(resolvedTickets, ticketQueue, searchResults);
-            }
-        }
-        printAllTickets(ticketQueue);  //print updated list
-
-    }
-
-
-    //Move the adding ticket code to a method
-    protected static void addTickets(LinkedList<Ticket> ticketQueue) {
-        Scanner sc = new Scanner(System.in);
-        boolean moreProblems = true;
-        String description, reporter;
-        Date dateReported = new Date(); //Default constructor creates date with current date/time
-        int priority;
-
-        while (moreProblems){
-            System.out.println("Enter problem");
-            description = sc.nextLine();
-            System.out.println("Who reported this issue?");
-            reporter = sc.nextLine();
-            System.out.println("Enter priority of " + description);
-            priority = Integer.parseInt(sc.nextLine());
-
-            Ticket t = new Ticket(description, priority, reporter, dateReported);
-            //ticketQueue.add(t);
-            addTicketInPriorityOrder(ticketQueue, t);
-
-            printAllTickets(ticketQueue);
-
-            System.out.println("More tickets to add?");
-            String more = sc.nextLine();
-            if (more.equalsIgnoreCase("N")) {
-                moreProblems = false;
-            }
-        }
-    }
+//    private static void writeResolved(LinkedList<Ticket> resolvedTickets){
+//        //get variables to generate a file name with current date parts
+//        Date date = new Date();
+//        SimpleDateFormat sdfDay = new SimpleDateFormat("dd");
+//        String day = sdfDay.format(date);
+//        SimpleDateFormat sdfMonth = new SimpleDateFormat("MMMM");
+//        String month = sdfMonth.format(date);
+//        SimpleDateFormat sdfYear = new SimpleDateFormat("YYYY");
+//        String year= sdfYear.format(date);
+//        //generated file name
+//        String fileName = "Resolved_tickets_as_of_"+month+"_"+day+"_"+year+".txt";
+//            try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter(fileName))) {
+//                for (Ticket t : resolvedTickets) {
+//                    //call overridden toString from ticket class
+//                    String writeFileLine = t.toString("resolved");
+//                    bufWrite.write(writeFileLine);
+//                }
+//            }
+//        catch(IOException ex){
+//            System.out.println("An IO Exception occured");
+//        }
+//
+//    }
+//    private static void writeOpen(LinkedList<Ticket> ticketQueue){
+//        if (!ticketQueue.isEmpty()) {
+//            try {
+//                //set up writing to facilitate reading of the file to generate objects
+//                try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter("openTickets.txt"))) {
+//                    for (Ticket t : ticketQueue) {
+//                        int id = t.getTicketID();
+//                        bufWrite.write(Integer.toString(id));
+//                        bufWrite.newLine();
+//                        bufWrite.write(t.getDescription());
+//                        bufWrite.newLine();
+//                        int p=t.getPriority();
+//                        bufWrite.write(Integer.toString(p));
+//                        bufWrite.newLine();
+//                        bufWrite.write(t.getReporter());
+//                        bufWrite.newLine();
+//                        DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy");
+//                        String date = df.format(t.getDateReported());
+//                        bufWrite.write(date);
+//                        bufWrite.newLine();
+//                    }
+//                }
+//            } catch (IOException ex) {
+//                System.out.println("An IO Exception occured");
+//            }
+//        }
+//    }
+//    private static LinkedList<Ticket> searchTicketbyName(LinkedList<Ticket> ticketQueue) {
+//        LinkedList<Ticket> searchResults = new LinkedList<>();
+//        if (ticketQueue.isEmpty()){
+//            System.out.println("No open tickets to search");
+//            return searchResults;
+//        }
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.println("Please enter the keyword(s) you would like to search for");
+//        String search = scanner.nextLine();
+//        //search list of tickets for keyword
+//        for (Ticket t :ticketQueue) {
+//            if (t.getDescription().contains(search)) {
+//                searchResults.add(t);
+//            }
+//        }
+//        printAllTickets(searchResults);
+//        return searchResults;
+//    }
+//
+//    protected static void deleteTicketbyID(LinkedList<Ticket> resolvedTickets, LinkedList<Ticket> ticketQueue) {
+//        printAllTickets(ticketQueue);   //display list for user
+//
+//        if (ticketQueue.size() == 0) {    //no tickets!
+//            System.out.println("No tickets to delete!\n");
+//            return;
+//        }
+//
+//
+//        System.out.println("Enter ID of ticket to delete");
+//        int deleteID = getPositiveIntInput();
+//
+//        //Loop over all tickets. Delete the one with this ticket ID
+//        boolean found = false;
+//        for (Ticket ticket : ticketQueue) {
+//            if (ticket.getTicketID() == deleteID) {
+//                found = true;
+//                setResolutionAndDate(ticket);
+//                ticketQueue.remove(ticket);
+//                //add resolved tickets for file storage
+//                resolvedTickets.add(ticket);
+//                System.out.println(String.format("Ticket %d deleted", deleteID));
+//                break; //don't need loop any more.
+//            }
+//        }
+//
+//        if (found == false) {
+//            System.out.println("Ticket ID not found, no ticket deleted");
+//            System.out.println("Would you like to try again? Y for yes");
+//            Scanner sc = new Scanner(System.in);
+//            String more = sc.nextLine();
+//            if (more.equalsIgnoreCase("y")) {
+//                //allow user to re-enter the ticket id
+//                deleteTicketbyID(resolvedTickets, ticketQueue);
+//            }
+//        }
+//        printAllTickets(ticketQueue);  //print updated list
+//
+//    }
+//    //override method to include search results from search method
+//    protected static void deleteTicketbyID(LinkedList<Ticket> resolvedTickets,
+//                                           LinkedList<Ticket> ticketQueue,
+//                                           LinkedList<Ticket> searchResults) {
+//        if (ticketQueue.size()==0) {
+//            System.out.println("No tickets found!\n");
+//            return;
+//        }
+//        if (searchResults.size() == 0) {    //no tickets!
+//            System.out.println("No tickets found!\n");
+//            return;
+//        }
+//        printAllTickets(searchResults);
+//        System.out.println("Enter ID of ticket to delete");
+//        int deleteID = getPositiveIntInput();
+//
+//        //Loop over all tickets. Delete the one with this ticket ID
+//        boolean found = false;
+//        for (Ticket ticket : searchResults) {
+//            if (ticket.getTicketID() == deleteID) {
+//                found = true;
+//                //get/set resolution for ticket to be deleted
+//                setResolutionAndDate(ticket);
+//                ticketQueue.remove(ticket);
+//                //add ticket to resolved list
+//                resolvedTickets.add(ticket);
+//                System.out.println(String.format("Ticket %d deleted", deleteID));
+//                break; //don't need loop any more.
+//            }
+//        }
+//
+//        if (found == false) {
+//            System.out.println("Ticket ID not found, no ticket deleted");
+//            System.out.println("Would you like to try again? Y for yes");
+//            Scanner sc = new Scanner(System.in);
+//            String more = sc.nextLine();
+//            if (more.equalsIgnoreCase("y")) {
+//                deleteTicketbyID(resolvedTickets, ticketQueue, searchResults);
+//            }
+//        }
+//        printAllTickets(ticketQueue);  //print updated list
+//
+//    }
+//
+//
+//    //Move the adding ticket code to a method
+//    protected static void addTickets(LinkedList<Ticket> ticketQueue) {
+//        Scanner sc = new Scanner(System.in);
+//        boolean moreProblems = true;
+//        String description, reporter;
+//        Date dateReported = new Date(); //Default constructor creates date with current date/time
+//        int priority;
+//
+//        while (moreProblems){
+//            System.out.println("Enter problem");
+//            description = sc.nextLine();
+//            System.out.println("Who reported this issue?");
+//            reporter = sc.nextLine();
+//            System.out.println("Enter priority of " + description);
+//            priority = Integer.parseInt(sc.nextLine());
+//
+//            Ticket t = new Ticket(description, priority, reporter, dateReported);
+//            //ticketQueue.add(t);
+//            addTicketInPriorityOrder(ticketQueue, t);
+//
+//            //printAllTickets(ticketQueue);
+//
+//            System.out.println("More tickets to add?");
+//            String more = sc.nextLine();
+//            if (more.equalsIgnoreCase("N")) {
+//                moreProblems = false;
+//            }
+//        }
+//    }
 
     protected static void addTicketInPriorityOrder(LinkedList<Ticket> tickets, Ticket newTicket){
 
@@ -383,45 +384,45 @@ public class TicketManager {
         //If that happens, it must be lower priority than all other tickets. So, add to the end.
         tickets.addLast(newTicket);
     }
-    protected static void printAllTickets(LinkedList<Ticket> tickets) {
-        System.out.println(" ------- List of Open Tickets ----------");
-
-        for (Ticket t : tickets ) {
-            System.out.println(t); //Write a toString method in Ticket class
-            //println will try to call toString on its argument
-        }
-        System.out.println(" ------- End of ticket list ----------");
-
-    }
-    //Validation method
-    private static int getPositiveIntInput() {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            try {
-                String stringInput = scanner.nextLine();
-                int intInput = Integer.parseInt(stringInput);
-                if (intInput >= 0) {
-                    return intInput;
-                } else {
-                    System.out.println("Please enter a vaild Ticket ID#");
-
-                    continue;
-                }
-            } catch (NumberFormatException ime) {
-                System.out.println("Please enter a valid Ticket ID#");
-            }
-
-        }
-
-    }
-    private static void setResolutionAndDate(Ticket ticket){
-        Scanner scanner= new Scanner(System.in);
-        System.out.println("Enter the reason why the ticket is being deleted");
-        String res = scanner.nextLine();
-        //time stamp resolution
-        ticket.setResolutionDate(new Date());
-        ticket.setResolution(res);
-
-    }
+//    protected static void printAllTickets(LinkedList<Ticket> tickets) {
+//        System.out.println(" ------- List of Open Tickets ----------");
+//
+//        for (Ticket t : tickets ) {
+//            System.out.println(t); //Write a toString method in Ticket class
+//            //println will try to call toString on its argument
+//        }
+//        System.out.println(" ------- End of ticket list ----------");
+//
+//    }
+//    //Validation method
+//    private static int getPositiveIntInput() {
+//        Scanner scanner = new Scanner(System.in);
+//        while (true) {
+//            try {
+//                String stringInput = scanner.nextLine();
+//                int intInput = Integer.parseInt(stringInput);
+//                if (intInput >= 0) {
+//                    return intInput;
+//                } else {
+//                    System.out.println("Please enter a vaild Ticket ID#");
+//
+//                    continue;
+//                }
+//            } catch (NumberFormatException ime) {
+//                System.out.println("Please enter a valid Ticket ID#");
+//            }
+//
+//        }
+//
+//    }
+//    private static void setResolutionAndDate(Ticket ticket){
+//        Scanner scanner= new Scanner(System.in);
+//        System.out.println("Enter the reason why the ticket is being deleted");
+//        String res = scanner.nextLine();
+//        //time stamp resolution
+//        ticket.setResolutionDate(new Date());
+//        ticket.setResolution(res);
+//
+//    }
 }
 

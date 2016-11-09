@@ -29,7 +29,8 @@ public class ResolutionGUI extends JFrame{
         pack();
         setVisible(true);
         getRootPane().setDefaultButton(resolveButton);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        //get data from ticket to display on the new GUI
         Date GUIDate = ticket.getDateReported();
         DateFormat df = new SimpleDateFormat("EEE MMM dd");
         String date = df.format(GUIDate);
@@ -42,12 +43,16 @@ public class ResolutionGUI extends JFrame{
 
     }
     private void addListeners(Ticket ticket, LinkedList<Ticket> resolved){
+        //reslove button click event handler
         resolveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                //adds resolution and resolution date to ticket
                 ticket.setResolutionDate(new Date());
                 ticket.setResolution(txtResolution.getText());
+                //writes resolved ticket to file
                 writeResolved(resolved);
+
                 dispose();
             }
         });
@@ -64,12 +69,11 @@ public class ResolutionGUI extends JFrame{
         String year= sdfYear.format(date);
         //generated file name
         String fileName = "Resolved_tickets_as_of_"+month+"_"+day+"_"+year+".txt";
-        try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter(fileName))) {
-            for (Ticket t : resolvedTickets) {
-                //call overridden toString from ticket class
-                String writeFileLine = t.toString("resolved");
-                bufWrite.write(writeFileLine);
-            }
+        //appends
+        try (BufferedWriter bufWrite = new BufferedWriter(new FileWriter(fileName, true))) {
+            Ticket t = resolvedTickets.getLast();
+            String writeFileLine = t.toString("resolved");
+            bufWrite.write(writeFileLine);
         }
         catch(IOException ex){
             System.out.println("An IO Exception occured");
