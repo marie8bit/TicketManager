@@ -67,12 +67,14 @@ import java.util.*;
 public class TicketManager {
 
     public static void main(String[] args) {
+
+
         //storage for open tickets
         LinkedList<Ticket> ticketQueue = new LinkedList<Ticket>();
         //Storage for resolved tickets
         LinkedList<Ticket> resolvedTickets = new LinkedList<>();
 
-        Scanner scan = new Scanner(System.in);
+        //Scanner scan = new Scanner(System.in);
         //try with resources
         try ( BufferedReader bufReader = new BufferedReader(new FileReader("openTickets.txt"));) {
             //generate a list of string values from the file
@@ -125,46 +127,48 @@ public class TicketManager {
         catch (IOException ex){
             System.out.println("File not found");
         }
-
-        while(true){
-
-
-            System.out.println("1. Enter Ticket\n2. Delete By ID \n3. Search by Name"+
-                    "\n4. Delete by Issue\n5. Display All Tickets\n6. Quit");
-            int task = getPositiveIntInput();
-
-            if (task == 1) {
-                //Call addTickets, which will let us enter any number of new tickets
-                addTickets(ticketQueue);
-
-            } else if (task == 2) {
-                //delete a ticket
-                deleteTicketbyID(resolvedTickets, ticketQueue);
-            //search for keyword in ticket description
-            }  else if (task == 3) {
-                //search description for keyword and display list
-                searchTicketbyName(ticketQueue);
-            //search for keyword in description then remove using a displayed list
-            }  else if (task == 4) {
-                //delete a ticket
-                LinkedList<Ticket> n3 =searchTicketbyName(ticketQueue);
-                deleteTicketbyID(resolvedTickets, ticketQueue, n3);
-            }  else if (task == 5){
-                printAllTickets(ticketQueue);
-            }  else if (task == 6) {
-                //Quit. Future prototype may want to save all tickets to a file
-                System.out.println("Quitting program");
-                break;
-            } else {
-                //requests valid data from the user
-                System.out.println("Please choose an option from the list");
-            }
-
-        }
+        NewTicketGUI newTGUI = new NewTicketGUI(resolvedTickets, ticketQueue);
+//        while(true){
+//
+//
+//            System.out.println("1. Enter Ticket\n2. Delete By ID \n3. Search by Name"+
+//                    "\n4. Delete by Issue\n5. Display All Tickets\n6. Quit");
+//            int task = getPositiveIntInput();
+//
+//            if (task == 1) {
+//                //Call addTickets, which will let us enter any number of new tickets
+//                addTickets(ticketQueue);
+//
+//            } else if (task == 2) {
+//                //delete a ticket
+//                deleteTicketbyID(resolvedTickets, ticketQueue);
+//            //search for keyword in ticket description
+//            }  else if (task == 3) {
+//                //search description for keyword and display list
+//                searchTicketbyName(ticketQueue);
+//            //search for keyword in description then remove using a displayed list
+//            }  else if (task == 4) {
+//                //delete a ticket
+//                LinkedList<Ticket> n3 =searchTicketbyName(ticketQueue);
+//                deleteTicketbyID(resolvedTickets, ticketQueue, n3);
+//            }  else if (task == 5){
+//                printAllTickets(ticketQueue);
+//            }  else if (task == 6) {
+//                //Quit. Future prototype may want to save all tickets to a file
+//                System.out.println("Quitting program");
+//                break;
+//            } else {
+//                //requests valid data from the user
+//                System.out.println("Please choose an option from the list");
+//            }
+//
+//        }
         //methods to write data to files
         writeResolved(resolvedTickets);
+        //close new ticket form method return list
+        // ticketQueue = stJList.
         writeOpen(ticketQueue);
-        scan.close();
+        //scan.close();
 
 
     }
